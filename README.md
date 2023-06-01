@@ -12,7 +12,7 @@ Work was supported by the Ministry of Education Youth nad Sports in the Czech Re
 creation of segmented tree stem and composite root-plate
 
 ### Input files: 
- <br>**mat_korsys.mac** material properties of root-plate
+**mat_korsys.mac** material properties of root-plate
  <br>**mat_kmen.mac** material properties of stem
  <br>**koef_mat.mac** matrix for reduction of material properties in segments
  <br>**DIC_0.mac** position of markers along the stem
