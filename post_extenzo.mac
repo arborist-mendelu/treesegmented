@@ -1,0 +1,217 @@
+!POST PROCESSING – EXTENSOMETERS/STRAINS
+!TREE – STEM AND ROOT-SOIL COMPLEX – PULLING TEST [m,N,Pa,°,kg] 
+!==============================================================================================================
+!
+*dim,ext,array,10,11	!create table
+*do,i,1,poc_kr	!run cycle with solution steps 
+ !----------longitudinal stem strains – extensometer 1 (EL1)
+ set,i	!load ls i
+ csys,0			
+ ! 
+ !conditions for getting position of extensometer in radius – changing with height of the stem
+ *if,vyska_EL1,le,vyska_1,then		!if height vyska_EL1 less then height of first segment–vyska_1
+  r_bodEL1=prum_pata/2-(vyska_EL1*tg_uhel_1)		!position of extensometer on x axis, upper part
+  r_bodEL1_b=prum_pata/2-(vyska_EL1_b*tg_uhel_1)		!position of extensometer on x axis, bottom part 
+  !
+  *elseif,vyska_EL1,gt,vyska_1,and,vyska_EL1,le,vyska_2,then	!if height vyska_EL1 between vyska_1 a vyska_2
+  r_bodEL1=prum_1/2-((vyska_EL1-vyska_1)*tg_uhel_2)			
+  r_bodEL1_b=prum_1/2-((vyska_EL1_b-vyska_1)*tg_uhel_2)		
+  !
+  *elseif,vyska_EL1,gt,vyska_2,and,vyska_EL1,le,vyska_3,then	!if height vyska_EL1 between vyska_2 a vyska_3
+  r_bodEL1=prum_2/2-((vyska_EL1-vyska_2)*tg_uhel_3)
+  r_bodEL1_b=prum_2/2-((vyska_EL1_b-vyska_2)*tg_uhel_3)		
+  !
+  *elseif,vyska_EL1,gt,vyska_3,and,vyska_EL1,le,vyska_4,then	!if height vyska_EL1 between vyska_3 a vyska_4
+  r_bodEL1=prum_3/2-((vyska_EL1-vyska_3)*tg_uhel_4)		
+  r_bodEL1_b=prum_3/2-((vyska_EL1_b-vyska_3)*tg_uhel_4)		
+  !
+  *elseif,vyska_EL1,gt,vyska_4,and,vyska_EL1,le,vyska_5,then	!if height vyska_EL1 between vyska_4 a vyska_5
+  r_bodEL1=prum_4/2-((vyska_EL1-vyska_4)*tg_uhel_5)
+  r_bodEL1_b=prum_4/2-((vyska_EL1_b-vyska_4)*tg_uhel_5)		
+  !
+  *elseif,vyska_EL1,gt,vyska_5,then				!if height vyska_EL1 more than vyska_5
+  r_bodEL1=prum_5/2-((vyska_EL1-vyska_5)*tg_uhel_6)			
+  r_bodEL1_b=prum_5/2-((vyska_EL1_b-vyska_5)*tg_uhel_6)	
+ *endif
+ !
+ csys,1			!cylindrical lsys	
+ EL1=node(r_bodEL1,uhelEL1y,vyska_EL1)			!get node at the position of EL1 - upper 
+ EL1_b=node(r_bodEL1_b,uhelEL1y,vyska_EL1_b)			!get node at the position of EL1 - bottom 
+ csys,0			!global cart. csys
+ !
+ *get,A_EL1x,node,EL1,loc,x			!get node position in glob. csys – x axis
+ *get,A_EL1_bx,node,EL1_b,loc,x			!get node position in glob. csys – x axis 
+ !
+ *get,A_EL1y,node,EL1,loc,y			!get node position in glob. csys – y axis
+ *get,A_EL1_by,node,EL1_b,loc,y			!get node position in glob. csys – y axis
+ ! 
+ *get,A_EL1z,node,EL1,loc,z			!get node position in glob. csys – z axis
+ *get,A_EL1_bz,node,EL1_b,loc,z			!get node position in glob. csys – z axis
+ !
+ *get,A_EL1_ux%i%,node,EL1,u,x			!get node displacement in glob. csys – x axis
+ *get,A_EL1_bux%i%,node,EL1_b,u,x			!get node displacement in glob. csys – x axis
+ !
+ *get,A_EL1_uy%i%,node,EL1,u,y			!get node displacement in glob. csys – y axis
+ *get,A_EL1_buy%i%,node,EL1_b,u,y			!get node displacement in glob. csys – y axis 
+ !
+ *get,A_EL1_uz%i%,node,EL1,u,z			!get node displacement in glob. csys – z axis
+ *get,A_EL1_buz%i%,node,EL1_b,u,z			!get node displacement in glob. csys – z axis 
+ !
+ !calculate position in ls i (position plus displacement)
+ !
+ A_EL1x_2_%i%=A_EL1x+A_EL1_ux%i%				!node position in after loading 
+ A_EL1bx_2_%i%=A_EL1_bx+A_EL1_bux%i%				!node position in after loading
+ A_EL1y_2_%i%=A_EL1y+A_EL1_uy%i%				!node position in after loading 
+ A_EL1by_2_%i%=A_EL1_by+A_EL1_buy%i%				!node position in after loading
+ A_EL1z_2_%i%=A_EL1z+A_EL1_uz%i%				!node position in after loading 
+ A_EL1bz_2_%i%=A_EL1_bz+A_EL1_buz%i%				!node position in after loading 
+ !distance between upper and bottom part of extensometer before loading
+ A_l_EL1ux=A_EL1x-A_EL1_bx 
+ A_l_EL1uy=A_EL1y-A_EL1_by 
+ A_l_EL1uz=A_EL1z-A_EL1_bz 
+ !
+ !distance between upper and bottom part of extensometer in each ls
+ A_l_EL1ux%i%=A_EL1x_2_%i%-A_EL1bx_2_%i%
+ A_l_EL1uy%i%=A_EL1y_2_%i%-A_EL1by_2_%i% 
+ A_l_EL1uz%i%=A_EL1z_2_%i%-A_EL1bz_2_%i%
+ !
+ A_l_EL1=sqrt(A_l_EL1ux**2+A_l_EL1uy**2+A_l_EL1uz**2)		!overall distance (resultant) – before loading
+ !
+ A_l_EL1%i%=sqrt(A_l_EL1ux%i%**2+A_l_EL1uy%i%**2+ A_l_EL1uz%i%**2)	!overall distance (resultant) in each ls
+ u_EL1%i%=(A_l_EL1%i%-A_l_EL1)*1000				!elongation (similar to exten. results
+ e_EL1%i%=u_EL1%i%/(A_l_EL1*1000)				!strain
+ !
+ !-----getting strains based on csys which is consistent with stem inclination
+ ! 
+ !wp positioning to incline stem 
+ wplane,1,A_EL1bx_2_%i%,A_EL1by_2_%i%,A_EL1bz_2_%i%,A_EL1x_2_%i%,A_EL1y_2_%i%,A_EL1z_2_%i%,0,0	
+ wprota,,,90	!wp rotation z axis along stem
+ wprota,90,,,	!wp rotation x to stem center
+ cswpla,%1000+i%,1	!create lsys (1001 - 1010)
+ wpcsys,0	!wp to orig. position
+ csys,0	!glob cart. csys 
+ rsys,%1000+i%	!results in created rsys 					
+ !
+ *get,e1rsys_z%i%,node,EL1,epto,z	!getting element strain in z direction upper position
+ *get,e1brsys_z%i%,node,EL1_b,epto,z	!getting element strain in z direction bottom position 
+ *get,e1rsys_%i%,node,EL1,epto,1	!getting element strain principal upper position
+ *get,e1brsys_%i%,node,EL1_b,epto,1	!getting element strain principal bottom position
+  rsys,0	!rsys back to global
+ !
+ !
+ !----------longitudinal stem strains – extensometer 2 (EL2)
+ !
+ csys,0
+ !
+ !conditions for getting position of extensometer in radius – changing with height of the stem 
+ *if,vyska_EL2,le,vyska_1,then	!if height vyska_EL2 less then height of first segment–vyska_1
+  r_bodEL2=prum_pata/2-(vyska_EL2*tg_uhel_1)	!position of extensometer on x axis, upper part 
+  r_bodEL2_b=prum_pata/2-(vyska_EL2_b*tg_uhel_1)	!position of extensometer on x axis, bottom part 
+  !  
+  *elseif,vyska_EL2,gt,vyska_1,and,vyska_EL2,le,vyska_2,then	!if height vyska_EL2 between vyska_1 a vyska_2 
+  r_bodEL2=prum_1/2-((vyska_EL2-vyska_1)*tg_uhel_2)	
+  r_bodEL2_b=prum_1/2-((vyska_EL2_b-vyska_1)*tg_uhel_2)		
+  !
+  *elseif,vyska_EL2,gt,vyska_2,and,vyska_EL2,le,vyska_3,then	!if height vyska_EL2 between vyska_2 a vyska_3
+  r_bodEL2=prum_2/2-((vyska_EL2-vyska_2)*tg_uhel_3)		
+  r_bodEL2_b=prum_2/2-((vyska_EL2_b-vyska_2)*tg_uhel_3)		
+  !
+  *elseif,vyska_EL2,gt,vyska_3,and,vyska_EL2,le,vyska_4,then	!if height vyska_EL2 between vyska_3 a vyska_4
+  r_bodEL2=prum_3/2-((vyska_EL2-vyska_3)*tg_uhel_4)			
+  r_bodEL2_b=prum_3/2-((vyska_EL2_b-vyska_3)*tg_uhel_4)
+  !
+  *elseif,vyska_EL2,gt,vyska_4,and,vyska_EL2,le,vyska_5,then	!if height vyska_EL2 between vyska_4 a vyska_5
+  r_bodEL2=prum_4/2-((vyska_EL2-vyska_4)*tg_uhel_5)			  
+  r_bodEL2_b=prum_4/2-((vyska_EL2_b-vyska_4)*tg_uhel_5)		  
+  !  
+  *elseif,vyska_EL2,gt,vyska_5,then				!if height vyska_EL1 more than vyska_5
+  r_bodEL2=prum_5/2-((vyska_EL2-vyska_5)*tg_uhel_6)			
+  r_bodEL2_b=prum_5/2-((vyska_EL2_b-vyska_5)*tg_uhel_6)	
+  !  
+ *endif
+ !
+ csys,1	cylinrical lsys
+ 
+ EL2=node(r_bodEL2,uhelEL2y,vyska_EL2)	!get node at the position of EL1 - upper 
+ EL2_b=node(r_bodEL2_b,uhelEL2y,vyska_EL2_b)	!get node at the position of EL1 - bottom
+ !
+ csys,0	!global cart. csys								
+ *get,A_EL2x,node,EL2,loc,x	!get node position in glob. csys – x axis
+ *get,A_EL2_bx,node,EL2_b,loc,x	!get node position in glob. csys – x axis
+ !
+ *get,A_EL2y,node,EL2,loc,y	!get node position in glob. csys – y axis
+ *get,A_EL2_by,node,EL2_b,loc,y	!get node position in glob. csys – y axis 
+ !
+ *get,A_EL2z,node,EL2,loc,z	!get node position in glob. csys – z axis
+ *get,A_EL2_bz,node,EL2_b,loc,z	!get node position in glob. csys – z axis
+ !
+ *get,A_EL2_ux%i%,node,EL2,u,x	!get node displacement in glob. csys – x axis		
+ *get,A_EL2_bux%i%,node,EL2_b,u,x	!get node displacement in glob. csys – x axis
+ !
+ *get,A_EL2_uy%i%,node,EL2,u,y	!get node displacement in glob. csys – y axis
+ *get,A_EL2_buy%i%,node,EL2_b,u,y	!get node displacement in glob. csys – y axis
+ ! 
+ *get,A_EL2_uz%i%,node,EL2,u,z	!get node displacement in glob. csys – z axis			
+ *get,A_EL2_buz%i%,node,EL2_b,u,z	!get node displacement in glob. csys – z axis
+ !
+ !calculate position in ls i (position plus displacement)
+ !
+ A_EL2x_2_%i%=A_EL2x+A_EL2_ux%i%	
+ A_EL2bx_2_%i%=A_EL2_bx+A_EL2_bux%i%
+ A_EL2y_2_%i%=A_EL2y+A_EL2_uy%i%	
+ A_EL2by_2_%i%=A_EL2_by+A_EL2_buy%i%	
+ A_EL2z_2_%i%=A_EL2z+A_EL2_uz%i%	
+ A_EL2bz_2_%i%=A_EL2_bz+A_EL2_buz%i%	
+ !
+ !distance between upper and bottom part of extensometer before loading
+ A_l_EL2ux=A_EL2x-A_EL2_bx
+ A_l_EL2uy=A_EL2y-A_EL2_by	 
+ A_l_EL2uz=A_EL2z-A_EL2_bz
+ !distance between upper and bottom part of extensometer in each ls
+ A_l_EL2ux%i%=A_EL2x_2_%i%-A_EL2bx_2_%i%
+ A_l_EL2uy%i%=A_EL2y_2_%i%-A_EL2by_2_%i%
+ A_l_EL2uz%i%=A_EL2z_2_%i%-A_EL2bz_2_%i%
+ ! 
+ A_l_EL2=sqrt(A_l_EL2ux**2+A_l_EL2uy**2+A_l_EL2uz**2)		!overall distance (resultant) – before loading 
+ !
+ A_l_EL2%i%=sqrt(A_l_EL2ux%i%**2+A_l_EL2uy%i%**2+ A_l_EL2uz%i%**2)	!overall distance (resultant) in each ls 
+ u_EL2%i%=(A_l_EL2%i%-A_l_EL2)*1000					!elongation (similar to exten. results
+ e_EL2%i%=u_EL2%i%/(A_l_EL2*1000)					!strain
+ !
+ !-----getting strains based on csys which is consistent with stem inclination
+ ! 
+ !wp positioning to incline stem 
+ wplane,1,A_EL2bx_2_%i%,A_EL2by_2_%i%,A_EL2bz_2_%i%,A_EL2x_2_%i%,A_EL2y_2_%i%,A_EL2z_2_%i%,0,0	
+ wprota,,,90	!wp rotation z axis along stem
+ wprota,90,,,	!wp rotation x to stem center
+ cswpla,%2000+i%,1	!create lsys (1001 - 1010)
+ wpcsys,0	!wp to orig. position
+ csys,0	!glob cart. csys 
+ rsys,%2000+i%	!results in created rsys
+ !
+ *get,e2rsys_z%i%,node,EL2+1,epto,z	!getting element strain in z direction upper position
+ *get,e2brsys_z%i%,node,EL2_b+1,epto,z	!getting element strain in z direction bottom position 
+ *get,e2rsys_%i%,node,EL2+1,epto,1	!getting element strain principal upper position 
+ *get,e2brsys_%i%,node,EL2_b+1,epto,1	!getting element strain principal bottom position
+ rsys,0	!rsys back to global
+ ! 
+ !write results into table ext
+ !------------EL1
+ ext(i,1)=RFkxA%i%	!force
+ ext(i,2)=e_EL1%i%	!strains from extensometers
+ ext(i,3)=e1rsys_%i%	!element strains_principal strain – upper part
+ ext(i,4)=e1brsys_%i%	!element strains_principal strain – bottom part
+ ext(i,5)=e1rsys_z%i%	!element strains_z strain – upper part
+ ext(i,6)=e1brsys_z%i%	!element strains_z strain – bottom part				
+ ! 
+ !------------EL2
+ ext(i,7)=e_EL2%i%	!strains from extensometers	
+ ext(i,8)=e2rsys_%i%	!element strains_principal strain – upper part			
+ ext(i,9)=e2brsys_%i%	!element strains_principal strain – bottom part
+ ext(i,10)=e2rsys_z%i%	!element strains_z strain – upper part
+ ext(i,11)=e2brsys_z%i%	!element strains_principal strain – upper part
+ !
+*enddo
+!
+/eof	!end
+

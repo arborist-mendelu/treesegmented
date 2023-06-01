@@ -1,0 +1,47 @@
+!DEFINITION OF MATERIAL PROPERTIES – ROOT-SOIL COMPLEX, 100-400 – 4. layers
+!TREE – STEM AND ROOT-SOIL COMPLEX – PULLING TEST [m,N,Pa,°,kg] 
+!==============================================================================================================
+!--------------------------------------------INPUT PARAMETERS--------------------------------------------------
+dens_p=2500	!soil density from [1]
+e_koren_1=5.8e9	!1st layer root properties/modulus – same as stem
+e_koren_2=e_koren_1/2	!2nd layer root properties
+e_koren_3=e_koren_1/4	!3rd layer root properties
+e_puda=2e7					!soil properties/modulus from [2] Foundation analysis
+pr_xy_p=0.3					!soil properties/poisson ratio from [2] Foundation analysis
+podil_koren_1=0.7				!1st layer ratio of root volume
+podil_koren_2=0.2				!2nd layer ratio of root volume
+podil_koren_3=0.05			!3rd layer ratio of root volume 
+podil_koren_4=0				!4th layer ratio of root volume 
+!--------------reading properties into material model, reduction of properties by coefficient from koef_mat
+!rule of mixture for properties of root-soil composite
+!1st layer
+*do,i,1,12											
+  mp,ex,100+i,e_koren_1*podil_koren_1*koef_mat(1,i)+e_puda*(1-podil_koren_1)		
+  mp,prxy,100+i,pr_xy_p									
+  mp,dens,100+i,dens_W*podil_koren_1*koef_mat(1,i)+dens_p*(1-podil_koren_1)
+*enddo
+!
+!2nd layer
+*do,i,1,12							
+  mp,ex,200+i,e_koren_2*podil_koren_2*koef_mat(2,i)+e_puda*(1-podil_koren_2)		
+  mp,prxy,200+i,pr_xy_p										
+  mp,dens,200+i,dens_W*podil_koren_2*koef_mat(2,i)+dens_p*(1-podil_koren_2)			
+*enddo
+!
+!3rd layer
+*do,i,1,12
+ mp,ex,300+i,e_koren_3*podil_koren_3*koef_mat(3,i)+e_puda*(1-podil_koren_3)	
+ mp,prxy,300+i,pr_xy_p										
+ mp,dens,300+i,dens_W*podil_koren_3*koef_mat(3,i)+dens_p*(1-podil_koren_3)			
+*enddo
+!
+!4th layer
+*do,i,1,12											
+ mp,ex,400+i,e_koren_3*podil_koren_4*koef_mat(4,i)+e_puda*(1-podil_koren_4)				
+ mp,prxy,400+i,pr_xy_p
+ mp,dens,400+i,dens_W*podil_koren_4*koef_mat(4,i)+dens_p*(1-podil_koren_4)		
+*enddo
+!------------------------------------------------
+[1] Kretschmann, D.E., 2010. Wood Handbook, Forest Service.
+[2] Bowles, J.E., Foundation Analysis and Design, 1997. 5 ed. The Mc Graw-Hill Companies, Inc.
+

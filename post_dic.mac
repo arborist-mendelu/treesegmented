@@ -1,0 +1,119 @@
+!POST PROCESSING – DIC/OPTICAL MARKERS
+!TREE – STEM AND ROOT-SOIL COMPLEX – PULLING TEST [m,N,Pa,°,kg] 
+!==============================================================================================================
+!
+*dim,DIC_0,table,42,2,1,,bod,xz				!create table for position od markers from DIC
+ *tread,DIC_0,DIC_0,mac,,1					!read table with values of positions
+ *do,i,1,42
+  T%i%_x=DIC_0(i,1)						!x position 
+  T%i%_z=DIC_0(i,2)						!z position
+*enddo
+!
+*dim,T,array,42,4,10						!create table for results
+!
+!selection of points and getting displacements – stem markers		
+!
+*do,i,1,poc_kr							!run cycle with load steps
+ set,i								!load ls i
+ csys,0								!prepnuti SS do csys a rsys 0 
+ rsys,0
+ !
+ !conditions for getting position of inclinometer in radius – changing with height of the stem
+ !
+ *do,j,1,mar_kmen
+  *if,T%j%_z,le,vyska_1,then				!if height T%j%_z less then height of first segment–vyska_1    
+  T%j%_y=prum_pata/2-(T%j%_z*tg_uhel_1)		!position of T%j%_y on y axis
+  !
+   *elseif,T%j%_z,gt,vyska_1,and,T%j%_z,le,vyska_2,then	 !if height T%j%_z between vyska_1 a vyska_2	
+   T%j%_y=prum_1/2-((T%j%_z-vyska_1)*tg_uhel_2)
+   *elseif,T%j%_z,gt,vyska_2,and,T%j%_z,le,vyska_3,then	 !if height T%j%_z between vyska_2 a vyska_3	
+   T%j%_y=prum_2/2-((T%j%_z-vyska_2)*tg_uhel_3)					
+   *elseif,T%j%_z,gt,vyska_3,and,T%j%_z,le,vyska_4,then	 !if height T%j%_z between vyska_3 a vyska_4	
+   T%j%_y=prum_3/2-((T%j%_z-vyska_3)*tg_uhel_4)
+   *elseif,T%j%_z,gt,vyska_4,and,T%j%_z,le,vyska_5,then	 !if height T%j%_z between vyska_4 a vyska_5	
+   T%j%_y=prum_4/2-((T%j%_z-vyska_4)*tg_uhel_5)
+   *elseif,T%j%_z,gt,vyska_5,and,T%j%_z,le,vyska_kmen,then	!if height T%j%_z more   
+   T%j%_y=prum_5/2-((T%j%_z-vyska_5)*tg_uhel_6)
+  *endif
+  !  
+  T%j%=node(T%j%_x,-T%j%_y,T%j%_z)	!get node at the position
+  !
+  *get,T%i%_%j%_ux,node,T%j%,u,x			!get node displacement in glob. csys – x axis
+  *get,T%i%_%j%_uz,node,T%j%,u,z			!get node displacement in glob. csys – z axis
+  !
+  *get,T%i%_%j%_z,node,T%j%,loc,z			!get node position in glob. csys – z axis  
+  *get,T%i%_%j%_x,node,T%j%,loc,x			!get node position in glob. csys – x axis  
+  !
+  !write results into table T
+  T(j,1,i)=T%i%_%j%_ux*1000				
+  T(j,2,i)=T%i%_%j%_uz*1000
+  T(j,3,i)=T%i%_%j%_z*1000
+  T(j,4,i)=T%i%_%j%_x*1000
+ *enddo
+ !
+ !selection of points and getting displacements – root-plate surface
+ !
+ !
+ *do,j,mar_kmen+1,mar_vse
+  T%j%=node(T%j%_x,0,T%j%_z)				!get node at the position - z=0
+  !
+  *get,T%i%_%j%_ux,node,T%j%,u,x			!get node displacement in glob. csys – x axis
+  *get,T%i%_%j%_uz,node,T%j%,u,z			!get node displacement in glob. csys – z axis
+  !
+  *get,T%i%_%j%_x,node,T%j%,loc,x			!get node position in glob. csys – x axis  
+  *get,T%i%_%j%_z,node,T%j%,loc,z			!get node position in glob. csys – z axis  
+  !
+  !write results into table T
+  T(j,1,i)=T%i%_%j%_ux*1000				
+  T(j,2,i)=T%i%_%j%_uz*1000
+  T(j,3,i)=T%i%_%j%_z*1000
+  T(j,4,i)=T%i%_%j%_x*1000
+ *enddo
+*enddo							
+!
+!-------slopes calculation stem
+!						
+X1_3=abs(T10_3_ux*1000)-abs(T10_1_ux*1000)			!distance between displacement of node 1,3
+Y1_3=(T10_3_z-T10_1_z)*1000						!distance between nodes in z
+X15_16=abs(T10_16_ux*1000)-abs(T10_15_ux*1000)		!distance between displacement of node 15,16
+Y15_16=(T10_16_z-T10_15_z)*1000					!distance between nodes in z
+a1_3=Y1_3/X1_3	!slope between 1 and 3
+a15_16=Y15_16/X15_16	!slope between 15 and 16
+!
+X6_7=abs(T10_7_ux*1000)-abs(T10_6_ux*1000)			!distance between displacement
+Y6_7=(T10_7_z-T10_6_z)*1000						!distance between nodes in z
+a6_7=Y6_7/X6_7	!slope
+!
+X3_4=abs(T10_4_ux*1000)-abs(T10_3_ux*1000)			!distance between displacement
+Y3_4=(T10_4_z-T10_3_z)*1000						!distance between nodes in z
+a3_4=Y6_7/X6_7	!slope
+!
+X1_2=abs(T10_2_ux*1000)-abs(T10_1_ux*1000)			!distance between displacement 
+Y1_2=(T10_2_z-T10_1_z)*1000						!distance between nodes in z
+a1_2=Y1_2/X1_2	!slope
+!
+u16_1=(T10_1_ux*1000)/(T10_16_ux*1000)	!ratio of displacements
+u16_2=(T10_2_ux*1000)/(T10_16_ux*1000)						
+!
+!-------slopes calculation root-plate
+!
+!near stem
+!
+x1_27=(T10_27_x-T10_1_x)*1000	!distance between nodes in z y1_27=abs(T10_27_ux*1000)-abs(T10_1_ux*1000)	!distance between displacement
+a1_27=Y1_27/X1_27	!slope
+!
+x1_18=(T10_18_x-T10_1_x)*1000					!distance between nodes in z
+y1_18=abs(T10_18_ux*1000)-abs(T10_1_ux*1000)			!distance between displacement
+a1_18=Y1_18/X1_18								!slope
+!
+!on the edge
+!
+x21_22=(T10_22_x-T10_21_x)*1000					!distance between nodes in z
+y21_22=abs(T10_21_ux*1000)-abs(T10_22_ux*1000)		!distance between displacement
+a21_22=Y21_22/X21_22							!slope
+!
+x31_33=abs((T10_33_x-T10_31_x)*1000)				!distance between nodes in z y31_33=abs(T10_31_ux*1000)-abs(T10_33_ux*1000)		!distance between displacement
+a31_33=Y31_33/X31_33							!slope
+!
+/eof										!end
+

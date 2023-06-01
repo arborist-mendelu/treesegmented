@@ -1,0 +1,440 @@
+!MAIN BATCH FILE
+!TREE – STEM AND ROOT-SOIL COMPLEX – PULLING TEST [m,N,Pa,°,kg] 
+!==============================================================================================================
+!--------------------------------------------INPUT PARAMETERS--------------------------------------------------
+!
+!------stem parameters – stem in two part (outer and inner circle)
+!
+vyska_1=0.35									!segments height
+vyska_2=0.7
+vyska_3=1
+vyska_4=1.3
+vyska_5=2						
+vyska_kmen=9.2									!stem height=height of pulling position
+!
+!------device position	
+!											
+!extensometer1 (E1)									!upper position is equal to upper segment edge 
+vyska_EL1=0.59									!upper position of extensometer 
+uhelEL1y=180									!position around circumference
+vyska_EL1_b=vyska_EL1-0.2							!bottom position of extensometer
+!
+prum_bodEL1=0.63									!stem diameter at the position of extensometer											!for selection of node is position calculated
+!	!from (r_bodEL1)
+!extensometer2 (EL2)
+vyska_EL2=0.62									!upper position of extensometer			
+uhelEL2y=0										!position around circumference 
+vyska_EL2_b=vyska_EL2-0.2							!bottom position of extensometer
+!
+!inclinometer1 
+vyska_I1=0.05									!upper position of inclinometer 
+uhelI1y=90										!position around circumference – neutral axis 
+vyska_I1b=vyska_I1-0.05							!bottom position of extensometer
+!
+!
+!inclinometer2
+vyska_I2=0.06									!upper position of inclinometer 
+uhelI2y=180										!position around circumference – leeward side
+vyska_I2b=vyska_I2-0.05							!bottom position of inclinometer
+!
+!inclinometer3 = height of pulling position 
+vyska_I3=vyska_kmen								!upper position of inclinometer
+uhelI3y=90  									!position around circumference – neutral axis 
+vyska_I3b=vyska_I3-0.05							!bottom position of inclinometer
+!
+!--------stem diameters var. A – calculation of diameters from tapering among individual segments
+!
+in=0.1										!thickness of outer wall
+prum_pata=0.67									!stem base diameter
+prum_pata_in=prum_pata-in							!diameter of inner zone
+prum_4=0.60										!diameter at 1.3 m (DBH)
+prum_4_in=prum_4-in
+sbh_1=((prum_pata-prum_bodEL1)/2)/vyska_EL1				!tapering between stem base and E1 
+prum_1=prum_bodEL1+(2*((vyska_EL1-vyska_1)*sbh_1))			!diameter at height 1
+prum_1_in=prum_1-in
+sbh_2=((prum_bodEL1-prum_4)/2)/(vyska_4-vyska_EL1)			!tapering between E1 and 1.3 m prum_2=prum_4+(2*((vyska_4-vyska_2)*sbh_2))				!diameter at height 2
+prum_2_in=prum_2-in
+prum_3=prum_4+(2*((vyska_4-vyska_3)*sbh_2))				!diameter at height 3	
+prum_3_in=prum_3-in
+prum_cep=0.23									!diameter at stem top = height of pulling prum_cep_in=prum_cep-in							
+sbh_3=((prum_4-prum_cep)/2)/(vyska_kmen-vyska_4)			!tapering between 1.3 m and top
+prum_5=prum_cep+(2*((vyska_kmen-vyska_5)*sbh_3))
+prum_5_in=prum_5-in
+!
+!--------stem diameters var. B – calculation of diameters for whole stem form one number – use for PDS
+!
+!sbh=0.02										!value of tapering
+!prum_pata=0.67									!stem base diameter
+!prum_pata_in=prum_pata-in
+!prum_1=(2*(prum_pata/2-(vyska_1*sbh)))						
+!prum_1_in=prum_1-in
+!prum_2=(2*(prum_pata/2-(vyska_2*sbh)))
+!prum_2_in=prum_2-in
+!prum_3=(2*(prum_pata/2-(vyska_3*sbh)))	
+!prum_3_in=prum_3-in
+!prum_4=(2*(prum_pata/2-(vyska_4*sbh)))
+!prum_4_in=prum_4-in
+!prum_5=(2*(prum_pata/2-(vyska_5*sbh)))
+!prum_5_in=prum_5-in					
+!prum_cep=(2*(prum_pata/2-(vyska_kmen*sbh)))
+!prum_cep_in=prum_cep-in !
+!--------------root plate dimensions 
+!
+pomer_vr=1/3										!ratio of root-plate dimensions - layers
+prum_bal_1vr=1.2										!diameter of 1st layer 
+hloubka_bal_1vr=0.65									!depth of 1st layer 
+prum_bal=prum_bal_1vr/(pomer_vr)							!overall plate diameter
+hloubka_oddenek=(prum_pata/2)*1/3							!depth of rootstock - 1/3 of stem diameter 
+hloubka_bal=hloubka_bal_1vr/(pomer_vr)						!depth of root-plate
+poc_vr_bal=3										!number of layers without rootstock part
+!
+!
+prum_bal_2vr=prum_bal*(1-pomer_vr)							!diameter 2nd layer
+hloubka_bal_2vr=hloubka_bal*(1-pomer_vr)					!depth of 2nd layer 
+! 
+!calculation of parameters for segment of a sphere – root-plate build from top segments of spheres
+!rootstock
+koule_polomer_od=((prum_pata/2)**2+hloubka_oddenek**2)/(2*hloubka_oddenek) 	!sphere diameter
+koule_posun_od=koule_polomer_od-hloubka_oddenek						!central position of sphere
+!
+!whole root-plate
+koule_polomer=(prum_bal/2)**2+hloubka_bal**2)/(2*hloubka_bal) 			!sphere diameter		
+koule_posun=koule_polomer-hloubka_bal 							!central position of sphere	
+!										
+!1st layer
+koule_polomer_1vr=((prum_bal_1vr/2)**2+hloubka_bal_1vr**2)/(2*hloubka_bal_1vr) 	!sphere diameter			
+koule_posun_1vr=koule_polomer_1vr-hloubka_bal_1vr						!central position of sphere	
+!
+!2nd layer
+koule_polomer_2vr=((prum_bal_2vr/2)**2+hloubka_bal_2vr**2)/(2*hloubka_bal_2vr) 	!sphere diameter	
+koule_posun_2vr=koule_polomer_2vr-hloubka_bal_2vr						!central position of sphere	
+!
+!--------mesh size – together with smartsizing
+!
+e_size=0.04			!size of stem elements
+e_size_bal=0.3		!size of root-plate elements	
+!
+!--------boundary conditions
+!
+podilz=0.6									!ratio for crown load – calculated from stem mass
+vzdal_nav=47.8								!winch distance 
+*afun,deg									!use degrees for angles
+uhel=12									!angle of pulling rope attachement
+sila_tah=8665								!pulling force	
+!
+mar_vse=42									!number of DIC markers (for result extraction)
+mar_kmen=16									!number of DIC markers stem
+mar_ks=mar_vse-mar_kmen						!number of DIC markers root-plate
+!
+!!!!!!CHANGE MATERIAL PROPERTIES mat_kmen.mac, mat_korsys.mac, koef_mat.mac!!!!!!!!
+!
+!------------------------------------GEOMETRY------------------------------------------------------------------
+/prep7							!start pre-processing
+!
+!btol,10e-20						!tolerance for volume overlapping – may be necessary for PDS
+!
+!---------------root-plate
+!rootstock
+wpoffs,,,koule_posun_od 				!move wp in Z direction to sphere centre
+sph4,0,0,koule_polomer_od				!create sphere
+wpcsys,,0 							!return wp to csys,0 (0,0,0)
+!
+!1st layer
+wpoffs,,,koule_posun_1vr				!move wp in Z direction to sphere centre
+sph4,0,0,koule_polomer_1vr				!create sphere 
+wpcsys,,0 							!return wp to csys,0 (0,0,0)
+!
+!2nd layer
+wpoffs,,,koule_posun_2vr				!move wp in Z direction to sphere centre 
+sph4,0,0,koule_polomer_2vr				!create sphere 
+wpcsys,,0 							!return wp to csys,0 (0,0,0)
+!
+!whole root-plate (3rd layer)
+wpoffs,,,koule_posun					!move wp in Z direction to sphere centre 
+sph4,0,0,,koule_polomer				!return wp to csys,0 (0,0,0)
+!
+vovlap,all							!create new volumes from overllaping
+wpcsys,,0 							!return wp to csys,0 (0,0,0)
+!
+vsbw,all,,delete						!divide volumes crossing with wp – delete original
+vsel,s,loc,z,0,koule_polomer*2,1			!select upper part of sphere - volumes
+vdele,all,,,,1						!delete upper part of sphere - volumes
+asel,s,loc,z,koule_polomer_od*0.01,koule_polomer*2,1 	!select upper part of sphere - areas
+adele,all,,,,1								!delete upper part of sphere - areas
+!
+!----------------stem
+cone,prum_pata/2,prum_1/2,0,vyska_1,0,360	!outer cones – 6 segments along height
+cone,prum_1/2,prum_2/2,vyska_1,vyska_2,0,360
+cone,prum_2/2,prum_3/2,vyska_2,vyska_3,0,360
+cone,prum_3/2,prum_4/2,vyska_3,vyska_4,0,360
+cone,prum_4/2,prum_5/2,vyska_4,vyska_5,0,360
+cone,prum_5/2,prum_cep/2,vyska_5,vyska_kmen,0,360
+!
+cone,prum_pata_in/2,prum_1_in/2,0,vyska_1,0,360			!inner cones – 6 segments along height cone,prum_1_in/2,prum_2_in/2,vyska_1,vyska_2,0,360
+cone,prum_2_in/2,prum_3_in/2,vyska_2,vyska_3,0,360
+cone,prum_3_in/2,prum_4_in/2,vyska_3,vyska_4,0,360
+cone,prum_4_in/2,prum_5_in/2,vyska_4,vyska_5,0,360
+cone,prum_5_in/2,prum_cep_in/2,vyska_5,vyska_kmen,0,360
+!
+vovlap,all							!create new volumes from overllaping 
+vsel,all							!select all
+!
+wpro,,90							!rotate wp around X (Y to Z -90°)
+*do,i,1,6							!rotate wp 6times around Y in 30° and create segments = 12 seg.
+  wpro,,,30							!rotate
+  vsbw,all							!divide (along z axis of wp)
+*enddo							!
+wpcsys,-1,0 						!return wp to csys – no modify direction
+!	
+vglue,all							!glue all – volumes will share borders		
+!
+cswpla,11,1,1,1						!create lsys cylinrical
+cswpla,12,2,1,1						!create lsys spherical
+!
+allsel
+!
+!-----------------load material properties and assign the properties with segments
+!
+*dim,koef_mat,table,16,12,1,,vrstvy,vysece			!create table for reduction coeff. for change of mat. 
+*tread,koef_mat,koef_mat,mac,,1					!read data to table from koef_mat.mac
+!
+mat_kmen.mac								!run macro with material properties of stem
+mat_korsys.mac								!run macro with material properties of root-plate
+!
+!
+!---------------------assign material properties to root-plate
+!
+*do,i,1,12									!rootstock
+  csys,2									!spherical lsys
+  asel,s,loc,x,0,prum_pata/2						!select area in radius		
+  asel,r,loc,y,(i-1)*30,i*30						!reselect area in segment (y)
+  csys,0									!csys,0
+  asel,r,loc,z,-(vyska_1*0.01),+(vyska_1*0.01)		!reselect height of the segment				
+  vsla,s,0									!select volumes attached to areas
+  vsel,u,loc,z,0,vyska_kmen						!unselect stem
+  vatt,%100+i%,1,2,12							!assign material numbers 100-112
+*enddo
+!
+*do,i,1,12									!1st layer
+  csys,2	!spherical lsys 
+  asel,s,loc,x,prum_pata/2,prum_bal_1vr/2			!select area in radius	
+  asel,r,loc,y,(i-1)*30,i*30						!reselect area in segment (y)
+  csys,0									!csys,0
+  asel,r,loc,z,-(vyska_1*0.01),+(vyska_1*0.01)		!reselect height of the segment 
+  vsla,s,0									!select volumes attached to areas
+  vsel,u,loc,z,0,vyska_kmen						!unselect stem 
+  vatt,%200+i%,1,2,12							!assign material numbers 200-212
+*enddo
+!
+*do,i,1,12									!2nd layer
+  csys,2									!spherical lsys 
+  asel,s,loc,x,prum_bal_1vr/2,prum_bal_2vr/2			!select area in radius	
+  asel,r,loc,y,(i-1)*30,i*30						!reselect area in segment (y)
+  csys,0									!csys,0
+  asel,r,loc,z,-(vyska_1*0.01),+(vyska_1*0.01)	 	!reselect height of the segment 
+  vsla,s,0									!select volumes attached to areas 
+  vsel,u,loc,z,0,vyska_kmen						!unselect stem 
+  vatt,%300+i%,1,2,12							!assign material numbers 300-312
+*enddo
+!
+*do,i,1,12	!3rd layer 
+  csys,2	!spherical lsys 
+  asel,s,loc,x,prum_bal_2vr/2,prum_bal/2	!select area in radius
+  asel,r,loc,y,(i-1)*30,i*30	!reselect area in segment (y)
+  csys,0	!csys,0
+  asel,r,loc,z,-(vyska_1*0.01),+(vyska_1*0.01)	 !reselect height of the segment 
+  vsla,s,0	!select volumes attached to areas 
+  vsel,u,loc,z,0,vyska_kmen	!unselect stem 
+  vatt,%400+i%,1,2,12	!assign material numbers 400-412
+*enddo
+!
+!---------------------assign material properties to inner stem
+!
+*do,j,1,5
+ *do,i,1,12		!1st bottom part – 5th part
+   csys,1		!cylindrical lsys
+   asel,s,loc,x,0,prum_%j%_in/2		!select area in radius 
+   asel,r,loc,y,(i-1)*30,i*30		!reselect area in segment (y)
+   csys,0		!csys,0
+   asel,r,loc,z,vyska_%j%-(vyska_1*0.01),vyska_%j%+(vyska_1*0.01)	!reselect height of the segment 
+   vsla,s,0 										!select volumes attached to areas 
+   vsel,u,loc,z,vyska_%j%,vyska_kmen			!unselect stem above
+   vatt,1000+((j-1)*100+i),1,1,11							!assign material numbers 1001_1012
+ *enddo
+*enddo
+!
+*do,i,1,12		!6th part 
+  csys,1		!cylindrical lsys	
+  asel,s,loc,x,0,prum_cep_in/2		!select area in radius 
+  asel,r,loc,y,(i-1)*30,i*30		!reselect area in segment (y)
+  csys,0		!csys,0	
+  asel,r,loc,z,vyska_kmen-(vyska_1*0.01),vyska_kmen+(vyska_1*0.01)		!reselect height of the segment		 
+  vsla,s,0 		!select volumes attached to areas 
+  vatt,1500+i,1,1,1		!assign material numbers 1501_1512
+*enddo
+!
+!---------------------assign material properties to inner stem
+!
+*do,j,1,5
+ *do,i,1,12	!1st bottom part – 5th part 
+   csys,1	!cylindrical lsys		
+   asel,s,loc,x,prum_%j%_in/2,prum_%j%/2	!select area in radius 
+   asel,r,loc,y,(i-1)*30,i*30	!reselect area in segment (y)
+   csys,0	!csys,0
+   asel,r,loc,z,vyska_%j%-(vyska_1*0.01),vyska_%j%+(vyska_1*0.01)	!reselect height of the segment		 
+   vsla,s,0 	!select volumes attached to areas 
+   vsel,u,loc,z,vyska_%j%,vyska_kmen	!unselect stem above 
+   vatt,2000+((j-1)*100+i),1,1,11	!assign material numbers 2001_2012	
+ *enddo
+*enddo
+!
+*do,i,1,12	!6th part 
+  csys,1	!cylindrical lsys	
+  asel,s,loc,x,prum_cep_in/2,prum_cep/2	!select area in radius  
+  asel,r,loc,y,(i-1)*30,i*30	!reselect area in segment (y)
+  csys,0	!csys,0
+  asel,r,loc,z,vyska_kmen-(vyska_1*0.01),vyska_kmen+(vyska_1*0.01)	!reselect height of the segment		 
+  vsla,s,0 	!select volumes attached to areas 
+  vatt,2500+i,1,1,11	!assign material numbers 2500_2512
+*enddo
+!
+csys,0	!global cart. csys
+allsel,all	!select all
+!								
+!------------------MESH----------------------------------------------------------------------------------------
+et,1,solid187	!stem elements
+et,2,solid187	!root-plate elements
+!
+vsel,s,loc,z,0,vyska_kmen	!select stem
+!esize,e_size	!set size, better not to – computation time
+smrtsize,1	!smartsize fine
+mshkey,0	!free mesh
+vmesh,all	!mesh whole stem
+allsel,all							
+!
+vsel,s,loc,z,0,-hloubka_bal	!select root-plate
+!esize,e_size_bal	!set size, better not to – computation time
+smrtsize,1								!smartsize fine 
+mshkey,0								!free mesh 
+vmesh,all	!mesh root-plate
+!
+allsel,all								!selet all
+!
+!-----------------SETTING BOUNDARY CONDITIONS AND SOLUTION----------------------------------------------------- 
+!
+!----------------compute forces
+vsel,s,loc,z,0,vyska_kmen				!select stem
+vsum,								!sum of selected volumes
+*get,vkmen,volu,0,volu					!get value of volume
+allsel							!select all
+mkmen=dens_W*vkmen					!stem mass
+mkoruna=mkmen*podilz					!crown mass
+fkor=-(mkoruna*9.81)					!force caused by crown
+! 
+sila_x=-(sila_tah*cos(uhel))				!x distribution of pulling force
+sila_z=-(sila_tah*sin(uhel))				!z distribution of pulling force 
+!
+Finish							!finish pre-processing
+!----------------solution
+/solu								!start solution
+antype,0							!static structural an. type
+nlgeom,on							!large deformations
+acel,0,0,9.81						!gravity load
+!
+csys,0							!global cart. csys
+asel,s,loc,x,prum_bal/2,prum_bal/2			!select areas on surface of root-plate – for DOF
+asel,a,loc,y,prum_bal/2,prum_bal/2
+asel,a,loc,z,-(hloubka_bal_2vr),-(hloubka_bal)
+!
+da,all,ux,0							!DOF anchorage of outer surface of root-soil complex(root-plate)
+da,all,uy,0
+da,all,uz,0
+allsel,all							!select all
+!
+poc_kr=10	!number of solution steps 
+*do,i,1,poc_kr	!10 steps with linearly increasing force 
+ csys,1	!cylinrical lsys
+ ksel,s,loc,x,prum_cep/2	!select point for pulling force – select radius
+ ksel,r,loc,z,vyska_kmen	!reselect stem height
+ ksel,r,loc,y,270,90	!reselect half of the stem outer surface 
+ !
+ *get,keypoints,kp,0,count	!get number of selected kpoints
+ !
+ *if,i,ne,1,then	!if step >1 add increasing pulling load, 1 is only gravity
+  csys,0	!global cart. csys
+  fk,all,fx,((sila_x/keypoints)/10)*i	!pulling force in x direction
+  fk,all,fz,((sila_z/keypoints)/10)*I	!pulling force in z direction
+  allsel,all	!select all
+  !
+  asel,s,loc,z,vyska_kmen,vyska_kmen+0.01	!select surfaces on top of the stem for added crown load
+  allsel,below,area 					!select entities bellow
+  ksel,r,loc,z,vyska_kmen				!reselect kpoint on the top of the stem
+  !
+  *get,keypoints_1,kp,0,count	!get number of selected kpoints
+  !
+  fk,all,fz,fkor/keypoints_1	!crown load	
+ *endif							
+ !
+ allsel,all	!select all
+ !
+ outres,all,all							!write all steps and substeps
+ lswrite,i								!write ls i in jobname.soi
+ solve								!solve
+*enddo								!end of cycle
+Finish	!stop solution
+!--------------------------------POSTPROCESSING----------------------------------------------------------------
+/post1	!run postprocessing
+allsel,all	!select all
+!
+*do,i,1,poc_kr	!get results for each step
+ set,i	!load step
+ !
+ !--------getting reaction force at the points of acnhorage
+ csys,0	!global cart. csys
+ asel,s,loc,x,prum_bal/2,prum_bal/2	!select areas on the surface of root-plate
+ asel,a,loc,y,prum_bal/2,prum_bal/2
+ asel,a,loc,z,-(hloubka_bal_2vr),-(hloubka_bal)	
+ nsla,s	!select nodes below the selected areas
+ fsum	!write fsum
+ *get,RFx%i%,fsum,0,item,fx	!get reaction forces in x
+ *get,RFy%i%,fsum,0,item,fy	!get reaction forces in y 
+ *get,RFz%i%,fsum,0,item,fz	!get reaction forces in z 
+ RF%i%=sqrt(RFx%i%**2+RFy%i%**2+RFz%i%**2)	!calculate resultant
+ allsel,all
+ !
+ !---------getting reaction for at the position of pulling (control) 
+ !
+ csys,1	!cylindrical lsys 
+ ksel,s,loc,x,prum_cep/2	!selection of kpoints of applied pulling force 
+ ksel,r,loc,z,vyska_kmen				
+ ksel,r,loc,y,90,270
+ nslk,s	!select nodes below kpoints
+ csys,0	!global cart. csys					
+ fsum	!write fsum
+ *get,RFkx%i%,fsum,0,item,fx	!get reaction forces in x 
+ RFkxA%i%=abs(RFkx%i%)	!absolute value
+ *get,RFky%i%,fsum,0,item,fy	!get reaction forces in y 
+ *get,RFkz%i%,fsum,0,item,fz	!get reaction forces in z 
+ RFk%i%=sqrt(RFkx%i%**2+RFky%i%**2+RFkz%i%**2)	!calculate resultant 
+ allsel,all
+ !
+*enddo
+!----------------------strains, inclinations and displacements
+!
+!---------compute taper between height segments for the position of nodes along stem surface
+!
+tg_uhel_1=(prum_pata/2-prum_1/2)/vyska_1	
+tg_uhel_2=(prum_1/2-prum_2/2)/(vyska_2-vyska_1) 
+tg_uhel_3=(prum_2/2-prum_3/2)/(vyska_3-vyska_2)		
+tg_uhel_4=(prum_3/2-prum_4/2)/(vyska_4-vyska_3)	
+tg_uhel_5=(prum_4/2-prum_5/2)/(vyska_5-vyska_4)		
+tg_uhel_6=(prum_5/2-prum_cep/2)/(vyska_kmen-vyska_5)		
+!
+post_extenzo.mac						!load macro for getting strains 
+post_inklino.mac						!load macro for getting inclinations
+post_dic.mac						!load macro for getting positions of markers
+!
+results.mac							!write results in to txt files
+!
+/eof	!end
+

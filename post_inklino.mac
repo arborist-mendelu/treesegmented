@@ -1,0 +1,312 @@
+!POST PROCESSING – INCLINOMETERS/INCLINATION
+!TREE – STEM AND ROOT-SOIL COMPLEX – PULLING TEST [m,N,Pa,°,kg] 
+!==============================================================================================================
+!
+*dim,ink,array,10,7					!create table
+*do,i,1,poc_kr					!run cycle with solution steps
+ !----------inclination – inclinometer 1 (I1)
+ set,i							!load ls i
+ csys,0
+ !
+ !conditions for getting position of inclinometer in radius – changing with height of the stem
+ *if,vyska_I1,le,vyska_1,then			!if height vyska_I1 less then height of first segment–vyska_1    
+  r_bodI1=prum_pata/2-(vyska_I1*tg_uhel_1)	!position of inclinometer on x axis, upper part		
+  r_bodI1b=prum_pata/2-(vyska_I1b*tg_uhel_1)	!position of inclinometer on x axis, bottom part	
+  !
+  *elseif,vyska_I1,gt,vyska_1,and,vyska_I1,le,vyska_2,then	!if height vyska_I1 between vyska_1 a vyska_2	
+   r_bodI1=prum_1/2-((vyska_I1-vyska_1)*tg_uhel_2)				
+   r_bodI1b=prum_1/2-((vyska_I1b-vyska_1)*tg_uhel_2)					
+   !
+  *elseif,vyska_I1,gt,vyska_2,and,vyska_I1,le,vyska_3,then	!if height vyska_I1 between vyska_2 a vyska_3	
+   r_bodI1=prum_2/2-((vyska_I1-vyska_2)*tg_uhel_3)				
+   r_bodI1b=prum_2/2-((vyska_I1b-vyska_2)*tg_uhel_3)					
+   !
+  *elseif,vyska_I1,gt,vyska_3,and,vyska_I1,le,vyska_4,then	!if height vyska_I1 between vyska_3 a vyska_4
+   r_bodI1=prum_3/2-((vyska_I1-vyska_3)*tg_uhel_4)				
+   r_bodI1b=prum_3/2-((vyska_I1b-vyska_3)*tg_uhel_4)			
+   !
+  *elseif,vyska_I1,gt,vyska_4,and,vyska_I1,le,vyska_5,then	!if height vyska_I1 between vyska_4 a vyska_5	
+   r_bodI1=prum_4/2-((vyska_I1-vyska_4)*tg_uhel_5)				
+   r_bodI1b=prum_4/2-((vyska_I1b-vyska_4)*tg_uhel_5)	
+   !  
+  *elseif,vyska_I1,gt,vyska_5,then						!if height vyska_I1 more		
+   r_bodI1=prum_5/2-((vyska_I1--vyska_5)* tg_uhel_6)			
+   r_bodI1b=prum_5/2-((vyska_I1b-vyska_5)*tg_uhel_6)	
+   !  
+ *endif													
+ !
+ csys,1								!cylindircal lsys	
+ I1=node(r_bodI1,uhelI1y,vyska_I1)				!get node at the position of I1 - upper
+ I1_b=node(r_bodI1b,uhelI1y,vyska_I1b)			!get node at the position of I1 - bottom
+ csys,0								!global cart. csys
+ !
+ !ziskani pozice bodu v puvodni pozici
+ !
+ *get,I1x,node,I1,loc,x					!get node position in glob. csys – x axis  
+ *get,I1_bx,node,I1_b,loc,x					!get node position in glob. csys – x axis
+ !
+ *get,I1y,node,I1,loc,y					!get node position in glob. csys – y axis
+ *get,I1_by,node,I1_b,loc,y					!get node position in glob. csys – y axis 
+ !
+ *get,I1z,node,I1,loc,z					!get node position in glob. csys – z axis 
+ *get,I1_bz,node,I1_b,loc,z					!get node position in glob. csys – z axis
+ !
+ !distance between upper and bottom part of inclinometer before loading
+ !closer distance between two points in z axis - more relevant results of inclination
+ l_I1x=I1x-I1_bx					
+ l_I1y=I1y-I1_by	
+ l_I1z=I1z-I1_bz
+ !
+ *get,I1_ux%i%,node,I1,u,x					!get node displacement in glob. csys – x axis
+ *get,I1_bux%i%,node,I1_b,u,x				!get node displacement in glob. csys – x axis
+ !
+ *get,I1_uz%i%,node,I1,u,z					!get node displacement in glob. csys – z axis 
+ *get,I1_buz%i%,node,I1_b,u,z				!get node displacement in glob. csys – z axis 
+ !
+ *get,I1_uy%i%,node,I1,u,y					!get node displacement in glob. csys – y axis 
+ *get,I1_buy%i%,node,I1_b,u,y				!get node displacement in glob. csys – y axis 
+ !
+ !calculate position in ls i (position plus displacement)
+ !
+ I1x_2_%i%=I1x+I1_ux%i%						!node position in after loading
+ I1bx_2_%i%=I1_bx+I1_bux%i%						!node position in after loading
+ I1z_2_%i%=I1z+I1_uz%i%						!node position in after loading  
+ I1bz_2_%i%=I1_bz+I1_buz%i%						!node position in after loading
+ I1y_2_%i%=I1y+I1_uy%i%						!node position in after loading
+ I1by_2_%i%=I1_by+I1_buy%i%						!node position in after loading
+ !
+ !distance between upper and bottom part of extensometer in each ls
+ l_I1_2ux%i%=I1x_2_%i%-I1bx_2_%i%			 
+ l_I1_2uz%i%=I1z_2_%i%-I1bz_2_%i%					
+ l_I1_2uy%i%=I1y_2_%i%-I1by_2_%i%				
+ !
+ !compute angle as resultant from three positions – difference before and after loading
+ !
+phi1_%i%=acos((l_I1x*l_I1_2ux%i%+l_I1z*l_I1_2uz%i%+l_I1y*l_I1_2uy%i%)/(sqrt(l_I1x**2+l_I1z**2+l_I1y**2)*sqrt(  l_I1_2ux%i%**2+l_I1_2uz%i%**2+l_I1_2uy%i%**2)))
+ !
+phi1_zx%i%=acos((l_I1x*l_I1_2ux%i%+l_I1z*l_I1_2uz%i%)/(sqrt(l_I1x**2+l_I1z**2)*sqrt(l_I1_2ux%i%**2+l_I1_2uz%i%**2)))
+!
+phi1_zy%i%=acos((l_I1z*l_I1_2uz%i%+l_I1y*l_I1_2uy%i%)/(sqrt(l_I1z**2+l_I1y**2)*sqrt(l_I1_2uz%i%**2+l_I1_2uy%i%**2)))
+!phi1_xy%i%=acos((l_I1x*l_I1_2ux%i%+l_I1y*l_I1_2uy%i%)/(sqrt(l_I1x**2+l_I1y**2)*sqrt(l_I1_2ux%i%**2+l_I1_2uy%i%**2)))
+ !
+ !----------inclination – inclinometer 2 (I2)
+ csys,0
+ !
+ !conditions for getting position of inclinometer in radius – changing with height of the stem
+ *if,vyska_I2,le,vyska_1,then			!if height vyska_I2 less then height of first segment–vyska_1
+  r_bodI2=prum_pata/2-(vyska_I2*tg_uhel_1)			!position of inclinometer on x axis, upper part
+  r_bodI2b=prum_pata/2-(vyska_I2b*tg_uhel_1)			!position of inclinometer on x axis, bottom part	
+  !
+  *elseif,vyska_I2,gt,vyska_1,and,vyska_I2,le,vyska_2,then	!if height vyska_I2 between vyska_1 a vyska_2
+  r_bodI2=prum_1/2-((vyska_I2-vyska_1)*tg_uhel_2)				
+  r_bodI2b=prum_1/2-((vyska_I2b-vyska_1)*tg_uhel_2)					
+  !
+  *elseif,vyska_I2,gt,vyska_2,and,vyska_I2,le,vyska_3,then	!if height vyska_I2 between vyska_2 a vyska_3
+  r_bodI2=prum_2/2-((vyska_I2-vyska_2)*tg_uhel_3)				
+  r_bodI2b=prum_2/2-((vyska_I2b-vyska_2)*tg_uhel_3)					
+  !
+  *elseif,vyska_I2,gt,vyska_3,and,vyska_I2,le,vyska_4,then	!if height vyska_I2 between vyska_3 a vyska_4
+  r_bodI2=prum_3/2-((vyska_I2-vyska_3)*tg_uhel_4)				
+  r_bodI2b=prum_3/2-((vyska_I2b-vyska_3)*tg_uhel_4)			
+  !
+  *elseif,vyska_I2,gt,vyska_4,and,vyska_I2,le,vyska_5,then	!if height vyska_I2 between vyska_4 a vyska_5	
+  r_bodI2=prum_4/2-((vyska_I2-vyska_4)*tg_uhel_5)				
+  r_bodI2b=prum_4/2-((vyska_I2b-vyska_4)*tg_uhel_5)	
+  !  
+  *elseif,vyska_I2,gt,vyska_5,then						!if height vyska_I2 more
+  r_bodI2=prum_5/2-((vyska_I2-vyska_5)* tg_uhel_6)			
+  r_bodI2b=prum_5/2-((vyska_I2b-vyska_5)*tg_uhel_6)	
+  !  
+ *endif
+ csys,1										!cylindrical lsys	
+ I2=node(r_bodI2,uhelI2y,vyska_I2)						!get node at the position of I1 - upper
+ I2_b=node(r_bodI2b,uhelI2y,vyska_I2b)					!get node at the position of I1 - bottom
+ csys,0										!glob. cart. csys
+ !	
+ *get,I2x,node,I2,loc,x							!get node position in glob. csys – x axis  
+ *get,I2_bx,node,I2_b,loc,x							!get node position in glob. csys – x axis  
+ !
+ *get,I2z,node,I2,loc,z							!get node position in glob. csys – z axis 
+ *get,I2_bz,node,I2_b,loc,z							!get node position in glob. csys – z axis  
+ !
+ *get,I2y,node,I2,loc,y						!get node position in glob. csys – y axis
+ *get,I2_by,node,I2_b,loc,y						!get node position in glob. csys – y axis  
+ !
+ !distance between upper and bottom part of inclinometer before loading
+ !closer distance between two points in z axis - more relevant results of inclination
+ l_I2x=I2x-I2_bx			
+ l_I2y=I2y-I2_by						 
+ l_I2z=I2z-I2_bz
+ !
+ *get,I2_ux%i%,node,I2,u,x					!get node displacement in glob. csys – x axis
+ *get,I2_bux%i%,node,I2_b,u,x				!get node displacement in glob. csys – x axis 
+ !
+ *get,I2_uz%i%,node,I2,u,z					!get node displacement in glob. csys – z axis
+ *get,I2_buz%i%,node,I2_b,u,z				!get node displacement in glob. csys – z axis
+ !
+ *get,I2_uy%i%,node,I2,u,y					!get node displacement in glob. csys – y axis
+ *get,I2_buy%i%,node,I2_b,u,y				!get node displacement in glob. csys – y axis
+ !
+ !calculate position in ls i (position plus displacement)
+ !
+ I2x_2_%i%=I2x+I2_ux%i%				!node position in after loading
+ I2bx_2_%i%=I2_bx+I2_bux%i%				!node position in after loading
+ I2z_2_%i%=I2z+I2_uz%i%				!node position in after loading
+ I2bz_2_%i%=I2_bz+I2_buz%i%				!node position in after loading
+ I2y_2_%i%=I2y+I2_uy%i%				!node position in after loading
+ I2by_2_%i%=I2_by+I2_buy%i%				!node position in after loading
+ !
+ !distance between upper and bottom part of extensometer in each ls
+ l_I2_2ux%i%=I2x_2_%i%-I2bx_2_%i%			
+ l_I2_2uz%i%=I2z_2_%i%-I2bz_2_%i%			
+ l_I2_2uy%i%=I2y_2_%i%-I2by_2_%i%			
+ !compute angle as resultant from three positions – difference before and after loading
+ !
+phi2_%i%=acos((l_I2x*l_I2_2ux%i%+l_I2z*l_I2_2uz%i%+l_I2y*l_I2_2uy%i%)/(sqrt(l_I2x**2+l_I2z**2+l_I2y**2)*sqrt(l_I2_2ux%i%**2+l_I2_2uz%i%**2+l_I2_2uy%i%**2)))
+!
+phi2_zx%i%=acos((l_I2x*l_I2_2ux%i%+l_I2z*l_I2_2uz%i%)/(sqrt(l_I2x**2+l_I2z**2)*sqrt(l_I2_2ux%i%**2+l_I2_2uz%i%**2)))
+!phi2_zy%i%=acos((l_I2z*l_I2_2uz%i%+l_I2y*l_I2_2uy%i%)/(sqrt(l_I2z**2+l_I2y**2)*sqrt(l_I2_2uz%i%**2+l_I2_2uy%i%**2)))
+!phi2_xy%i%=acos((l_I2x*l_I2_2ux%i%+l_I2y*l_I2_2uy%i%)/(sqrt(l_I2x**2+l_I2y**2)*sqrt(l_I2_2ux%i%**2+l_I2_2uy%i%**2)))
+ !
+ !----------inclination – inclinometer 3 (I3)
+ !
+ csys,0
+ !
+ !conditions for getting position of inclinometer in radius – changing with height of the stem
+ *if,vyska_I3,le,vyska_1,then			!if height vyska_I1 less then height of first segment–vyska_1  
+  r_bodI3=prum_pata/2-(vyska_I3*tg_uhel_1)	!position of inclinometer on x axis, upper part
+  r_bodI3b=prum_pata/2-(vyska_I3b*tg_uhel_1)	!position of inclinometer on x axis, bottom part
+  !
+  *elseif,vyska_I3,gt,vyska_1,and,vyska_I3,le,vyska_2,then   	!if height vyska_I3 between vyska_1 a vyska_2 
+   r_bodI3=prum_1/2-((vyska_I3-vyska_1)*tg_uhel_2)				
+   r_bodI3b=prum_1/2-((vyska_I3b-vyska_1)*tg_uhel_2)					
+   !
+  *elseif,vyska_I3,gt,vyska_2,and,vyska_I3,le,vyska_3,then   	!if height vyska_I3 between vyska_2 a vyska_3  
+   r_bodI3=prum_2/2-((vyska_I3-vyska_2)*tg_uhel_3)				
+   r_bodI3b=prum_2/2-((vyska_I3b-vyska_2)*tg_uhel_3)					
+  !
+  *elseif,vyska_I3,gt,vyska_3,and,vyska_I3,le,vyska_4,then	!if height vyska_I3 between vyska_3 a vyska_4
+   r_bodI3=prum_3/2-((vyska_I3-vyska_3)*tg_uhel_4)				
+   r_bodI3b=prum_3/2-((vyska_I3b-vyska_3)*tg_uhel_4)			
+  !
+  *elseif,vyska_I3,gt,vyska_4,and,vyska_I3,le,vyska_5,then	!if height vyska_I3 between vyska_4 a vyska_5	
+   r_bodI3=prum_4/2-((vyska_I3-vyska_4)*tg_uhel_5)				
+   r_bodI3b=prum_4/2-((vyska_I3b-vyska_4)*tg_uhel_5)	
+  !  
+  *elseif,vyska_I3,gt,vyska_5,then							!if height vyska_I3 more
+   r_bodI3=prum_5/2-((vyska_I3-vyska_5)* tg_uhel_6)			
+   r_bodI3b=prum_5/2-((vyska_I3b-vyska_5)*tg_uhel_6)	
+  !  
+ *endif
+ !
+ csys,1	!cylindrical lsys							
+ I3=node(r_bodI3,uhelI3y,vyska_I3)	!get node at the position of I1 - upper
+ I3_b=node(r_bodI3b,uhelI3y,vyska_I3b)	!get node at the position of I1 – bottom
+ csys,0
+ !
+ *get,I3x,node,I3,loc,x	!get node position in glob. csys – x axis
+ *get,I3_bx,node,I3_b,loc,x	!get node position in glob. csys – x axis
+ !
+ *get,I3z,node,I3,loc,z	!get node position in glob. csys – z axis
+ *get,I3_bz,node,I3_b,loc,z	!get node position in glob. csys – z axis
+ !
+ *get,I3y,node,I3,loc,y	!get node position in glob. csys – y axis
+ *get,I3_by,node,I3_b,loc,y	!get node position in glob. csys – y axis
+ !
+ !distance between upper and bottom part of inclinometer before loading
+ !closer distance between two points in z axis - more relevant results of inclination
+ l_I3x=I3x-I3_bx			
+ l_I3y=I3y-I3_by							
+ l_I3z=I3z-I3_bz		
+ !
+ *get,I3_ux%i%,node,I3,u,x					!get node displacement in glob. csys – x axis 
+ *get,I3_bux%i%,node,I3_b,u,x				!get node displacement in glob. csys – x axis  
+ !
+ *get,I3_uz%i%,node,I3,u,z					!get node displacement in glob. csys – z axis 
+ *get,I3_buz%i%,node,I3_b,u,z				!get node displacement in glob. csys – z axis 
+ !
+ *get,I3_uy%i%,node,I3,u,y					!get node displacement in glob. csys – y axis
+ *get,I3_buy%i%,node,I3_b,u,y				!get node displacement in glob. csys – y axis
+ !
+ !calculate position in ls i (position plus displacement) 
+ !
+ I3x_2_%i%=I3x+I3_ux%i%				!node position in after loading
+ I3bx_2_%i%=I3_bx+I3_bux%i%				!node position in after loading
+ I3z_2_%i%=I3z+I3_uz%i%				!node position in after loading
+ I3bz_2_%i%=I3_bz+I3_buz%i%				!node position in after loading
+ I3y_2_%i%=I3y+I3_uy%i%				!node position in after loading
+ I3by_2_%i%=I3_by+I3_buy%i%				!node position in after loading
+ !
+ !distance between upper and bottom part of extensometer in each ls
+ l_I3_2ux%i%=I3x_2_%i%-I3bx_2_%i%			
+ l_I3_2uz%i%=I3z_2_%i%-I3bz_2_%i%			
+ l_I3_2uy%i%=I3y_2_%i%-I3by_2_%i%			
+ !
+ !compute angle as resultant from three positions – difference before and after loading
+ !
+phi3_%i%=acos((l_I3x*l_I3_2ux%i%+l_I3z*l_I3_2uz%i%+l_I3y*l_I3_2uy%i%)/(sqrt(l_I3x**2+l_I3z**2+l_I3y**2)*sqrt(l_I3_2ux%i%**2+l_I3_2uz%i%**2+l_I3_2uy%i%**2)))
+ !
+phi3_zx%i%=acos((l_I3x*l_I3_2ux%i%+l_I3z*l_I3_2uz%i%)/(sqrt(l_I3x**2+l_I3z**2)*sqrt(l_I3_2ux%i%**2+l_I3_2uz%i%**2)))
+ !
+!phi3_zy%i%=acos((l_I3z*l_I3_2uz%i%+l_I3y*l_I3_2uy%i%)/(sqrt(l_I3z**2+l_I3y**2)*sqrt(l_I3_2uz%i%**2+l_I3_2uy%i%**2)))
+ !
+!phi3_xy%i%=acos((l_I3x*l_I3_2ux%i%+l_I3y*l_I3_2uy%i%)/(sqrt(l_I3x**2+l_I3y**2)*sqrt(l_I3_2ux%i%**2+l_I3_2uy%i%**2)))
+ !
+ !----------inclination of root-plate surface – inclinometer 5 (I5)
+ !
+ csys,1	!cylindrical lsys
+ I5osax=0	!position of I5
+ I5_bosax=I5osax+0.05	!position of I5 – right
+ I5=node(I5osax,0,0)	!get node at the position of I5
+ I5_b=node(I5_bosax,0,0)	!get node at the position of I5 - right
+ csys,0	!glob. cart. csys
+ !
+ *get,I5x,node,I5,loc,x			!get node position in glob. csys – x axis 
+ *get,I5_bx,node,I5_b,loc,x			!get node position in glob. csys – x axis
+ l_I5x=I5_bx-I5x		!distance between nodes
+ !
+ *get,I5z,node,I5,loc,z			!get node position in glob. csys – z axis
+ *get,I5_bz,node,I5_b,loc,z			!get node position in glob. csys – z axis
+ l_I5z=I5_bz-I5z			!distance between nodes
+ !
+ *get,I5y,node,I5,loc,y			!get node position in glob. csys – y axis
+ *get,I5_by,node,I5_b,loc,y			!get node position in glob. csys – y axis
+ l_I5y=I5_by-I5y			!distance between nodes
+ !
+ *get,I5_ux%i%,node,I5,u,x			!get node displacement in glob. csys – x axis
+ *get,I5_bux%i%,node,I5_b,u,x			!get node displacement in glob. csys – x axis
+ *get,I5_uz%i%,node,I5,u,z			!get node displacement in glob. csys – z axis 
+ *get,I5_buz%i%,node,I5_b,u,z			!get node displacement in glob. csys – z axis 
+ *get,I5_uy%i%,node,I5,u,y			!get node displacement in glob. csys – y axis
+ *get,I5_buy%i%,node,I5_b,u,y			!get node displacement in glob. csys – y axis
+ !
+ I5x_2_%i%=I5x+I5_ux%i%			!node position in after loading
+ I5bx_2_%i%=I5_bx+I5_bux%i%			!node position in after loading 
+ I5z_2_%i%=I5z+I5_uz%i%			!node position in after loading
+ I5bz_2_%i%=I5_bz+I5_buz%i%			!node position in after loading
+ I5y_2_%i%=I5y+I5_uy%i%			!node position in after loading
+ I5by_2_%i%=I5_by+I5_buy%i%			!node position in after loading
+ !
+ !distance between nodes in each ls
+ l_I5_2ux%i%=I5bx_2_%i%-I5x_2_%i%			
+ l_I5_2uz%i%=I5bz_2_%i%-I5z_2_%i% 			
+ l_I5_2uy%i%=I5by_2_%i%-I5y_2_%i%			
+ ! 
+ !compute angle as resultant from three positions – difference before and after loading
+phi5_%i%=acos((l_I5x*l_I5_2ux%i%+l_I5z*l_I5_2uz%i%+l_I5y*l_I5_2uy%i%)/(sqrt(l_I5x**2+l_I5z**2+l_I5y**2)*sqrt(l_I5_2ux%i%**2+l_I5_2uz%i%**2+l_I5_2uy%i%**2)))
+ !
+ !zapsani vysledku naklonu do tabulky 
+ !
+ !write results into table ink
+ !
+ ink(i,1)=RFkxA%i%		!force
+ ink(i,2)=phi1_%i%		!I1 sum
+ ink(i,3)=phi1_zx%i%		!I1 zx
+ ink(i,4)=phi2_%i%		!I2 sum
+ ink(i,5)=phi2_zx%i%		!I2 zx
+ ink(i,6)=phi3_%i%		!I3 sum
+ ink(i,7)=phi5_%i%		!I5 sum
+ !
+*enddo
+/eof					!end
+

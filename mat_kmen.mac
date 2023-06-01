@@ -1,0 +1,163 @@
+!DEFINITION OF MATERIAL PROPERTIES - STEM
+!TREE – STEM AND ROOT-SOIL COMPLEX – PULLING TEST [m,N,Pa,°,kg] 
+!==============================================================================================================
+!INNER STEM 1000-1500 – 6. segments, OUTER STEM 2000-2500 – 6. Segments
+!
+!--------------------------------------------INPUT PARAMETERS--------------------------------------------------
+!
+dens_W=880				!denisty green wood – from [1]
+!
+!stem base 
+!
+e_z=5.8e9	 			!calculated from measured longitudinal strains
+e_x=e_z*0.066			!elastic ratio ER/EL for basswood - from [1]
+e_y=e_z*0.027			!elastic ratio ET/EL for basswood - from [1]
+!
+g_xy=e_z*0.02 			!elastic ratio GRT/EL for basswood - from [1]
+g_yz=e_z*0.046			!elastic ratio GTL/EL for basswood - from [1]
+g_xz=e_z*0.056			!elastic ratio GRL/EL for ash - from [2]
+!
+!from base to 1m
+!
+e_z1=5.8e9
+e_x1=e_z1*0.066
+e_y1=e_z1*0.027
+!
+g_xy1=e_z1*0.02 
+g_yz1=e_z1*0.046
+g_xz1=e_z1*0.056
+!
+!from 1m to 2m
+!
+e_z2=5.8e9
+e_x2=e_z2*0.066
+e_y2=e_z2*0.027
+!
+g_xy2=e_z2*0.02
+g_yz2=e_z2*0.046		
+g_xz2=e_z2*0.056	
+!
+nu_xy=0.346			!NURT minor poisson ratios basswood - from [1]
+nu_yz=0.022			!NUTL minor poisson ratios basswood - from [1]
+nu_xz=0.034			!NURL minor poisson ratios basswood - from [1]
+!
+!--------------reading properties into material model, reduction of properties by coefficient from koef_mat
+!inner stem to 0.3m – volume 1000
+!
+*do,i,5,5								!stem height segment/layer
+ *do,j,1,12								!cycle for each segment within diameter 
+    mp,ex,(1000+(i-5)*100)+j,e_x*koef_mat(i,j)	!number assignment and reduction coefficient
+    mp,ey,(1000+(i-5)*100)+j,e_y*koef_mat(i,j)
+    mp,ez,(1000+(i-5)*100)+j,e_z*koef_mat(i,j)
+    !
+    mp,gxy,(1000+(i-5)*100)+j,g_xy*koef_mat(i,j)
+    mp,gyz,(1000+(i-5)*100)+j,g_yz*koef_mat(i,j)
+    mp,gxz,(1000+(i-5)*100)+j,g_xz*koef_mat(i,j)
+    !
+    mp,nuxy,(1000+(i-5)*100)+j,nu_xy
+    mp,nuyz,(1000+(i-5)*100)+j,nu_yz
+    mp,nuxz,(1000+(i-5)*100)+j,nu_xz
+    !
+    mp,dens,(1000+(i-5)*100)+j,dens_w*koef_mat(i,j)
+ *enddo
+*enddo
+!
+!inner stem from 0.3m to 1m - volumes 1100,1200
+!
+*do,i,6,7								
+ *do,j,1,12	
+    mp,ex,(1000+(i-5)*100)+j,e_x1*koef_mat(i,j)				
+    mp,ey,(1000+(i-5)*100)+j,e_y1*koef_mat(i,j)
+    mp,ez,(1000+(i-5)*100)+j,e_z1*koef_mat(i,j)
+    !
+    mp,gxy,(1000+(i-5)*100)+j,g_xy1*koef_mat(i,j)
+    mp,gyz,(1000+(i-5)*100)+j,g_yz1*koef_mat(i,j)
+    mp,gxz,(1000+(i-5)*100)+j,g_xz1*koef_mat(i,j)
+    !
+    mp,nuxy,(1000+(i-5)*100)+j,nu_xy					
+    mp,nuyz,(1000+(i-5)*100)+j,nu_yz
+    mp,nuxz,(1000+(i-5)*100)+j,nu_xz
+    !
+    mp,dens,(1000+(i-5)*100)+j,dens_w*koef_mat(i,j)
+ *enddo
+*enddo
+!
+!inner stem from 1m to top (vyska_kmen) – volumes 1300,1400,1500
+!
+*do,i,8,10								
+ *do,j,1,12								
+    mp,ex,(1000+(i-5)*100)+j,e_x2*koef_mat(i,j)
+    mp,ey,(1000+(i-5)*100)+j,e_y2*koef_mat(i,j)
+    mp,ez,(1000+(i-5)*100)+j,e_z2*koef_mat(i,j)
+    !
+    mp,gxy,(1000+(i-5)*100)+j,g_xy2*koef_mat(i,j)
+    mp,gyz,(1000+(i-5)*100)+j,g_yz2*koef_mat(i,j)
+    mp,gxz,(1000+(i-5)*100)+j,g_xz2*koef_mat(i,j)
+    !
+    mp,nuxy,(1000+(i-5)*100)+j,nu_xy					
+    mp,nuyz,(1000+(i-5)*100)+j,nu_yz
+    mp,nuxz,(1000+(i-5)*100)+j,nu_xz
+    !
+    mp,dens,(1000+(i-5)*100)+j,dens_w*koef_mat(i,j)
+ *enddo
+*enddo
+!
+!outer stem to 0.3m – volume 2000
+! 
+*do,i,11,11								
+ *do,j,1,12								
+    mp,ex,(2000+(i-11)*100)+j,e_x*koef_mat(i,j)
+    mp,ey,(2000+(i-11)*100)+j,e_y*koef_mat(i,j)
+    mp,ez,(2000+(i-11)*100)+j,e_z*koef_mat(i,j)
+    !
+    mp,gxy,(2000+(i-11)*100)+j,g_xy*koef_mat(i,j)
+    mp,gyz,(2000+(i-11)*100)+j,g_yz*koef_mat(i,j)
+    mp,gxz,(2000+(i-11)*100)+j,g_xz*koef_mat(i,j)
+    !
+    mp,nuxy,(2000+(i-11)*100)+j,nu_xy					
+    mp,nuyz,(2000+(i-11)*100)+j,nu_yz
+    mp,nuxz,(2000+(i-11)*100)+j,nu_xz
+    !
+    mp,dens,(2000+(i-11)*100)+j,dens_w*koef_mat(i,j)
+  *enddo
+*enddo
+!outer stem from 0.3m to 1m - volumes 2100,2200
+*do,i,12,13							
+ *do,j,1,12								
+    mp,ex,(2000+(i-11)*100)+j,e_x1*koef_mat(i,j)
+    mp,ey,(2000+(i-11)*100)+j,e_y1*koef_mat(i,j)
+    mp,ez,(2000+(i-11)*100)+j,e_z1*koef_mat(i,j)
+    !
+    mp,gxy,(2000+(i-11)*100)+j,g_xy1*koef_mat(i,j)
+    mp,gyz,(2000+(i-11)*100)+j,g_yz1*koef_mat(i,j)
+    mp,gxz,(2000+(i-11)*100)+j,g_xz1*koef_mat(i,j)
+    !
+    mp,nuxy,(2000+(i-11)*100)+j,nu_xy					
+    mp,nuyz,(2000+(i-11)*100)+j,nu_yz
+    mp,nuxz,(2000+(i-11)*100)+j,nu_xz
+    !
+    mp,dens,(2000+(i-11)*100)+j,dens_w*koef_mat(i,j)
+  *enddo
+*enddo
+!outer stem from 1m to top (vyska_kmen) – volumes 2300,2400,2500
+*do,i,14,16								
+*do,j,1,12								
+    mp,ex,(2000+(i-11)*100)+j,e_x2*koef_mat(i,j)
+    mp,ey,(2000+(i-11)*100)+j,e_y2*koef_mat(i,j)
+    mp,ez,(2000+(i-11)*100)+j,e_z2*koef_mat(i,j)
+    !
+    mp,gxy,(2000+(i-11)*100)+j,g_xy2*koef_mat(i,j)
+    mp,gyz,(2000+(i-11)*100)+j,g_yz2*koef_mat(i,j)
+    mp,gxz,(2000+(i-11)*100)+j,g_xz2*koef_mat(i,j)
+    !
+    mp,nuxy,(2000+(i-11)*100)+j,nu_xy					
+    mp,nuyz,(2000+(i-11)*100)+j,nu_yz
+    mp,nuxz,(2000+(i-11)*100)+j,nu_xz
+    !
+    mp,dens,(2000+(i-11)*100)+j,dens_w*koef_mat(i,j)
+  *enddo
+*enddo
+!--------------------------------------------------
+![1] Kretschmann, D.E., 2010. Wood Handbook, Forest Service.
+![2] Požgaj, A., CHovanec, D., Kurjatko, S., Babiak, M. 1993. Štruktúra a vlastnosti dreva. 1. vyd. Bratislava: Príroda a.s. 486 s. ISBN 80-07-00600-1
+

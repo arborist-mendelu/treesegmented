@@ -1,0 +1,45 @@
+!PDS – sensitivity analysis
+!TREE – STEM AND ROOT-SOIL COMPLEX – PULLING TEST [m,N,Pa,°,kg] 
+!==============================================================================================================
+!Geometry and material properties
+/inp,strom,mac			        !run macro strom.mac
+/pds					        !start "probabilistic design system"
+!
+pdanl,strom,mac			        !job name
+!------input parameters		    !uniform distribution
+!geometry
+pdvar,sbh,unif,1e-2,2e-2						        !tapering	
+pdvar,prum_pata,unif,0.65-(0.05*0.65),0.65+(0.05*0.65),	!stem base diameter
+pdvar,hloubka_bal_1vr,unif,0.65/2,0.05				    !depth of root_plate hr2
+pdvar,prum_bal_1vr,unif,1.3,1.8					        !diameter of root_plate dr2
+!
+!material
+pdvar,e_z,unif,5.2e9,9.4e9						!elastic modulus stem base
+pdvar,e_z1,unif,5.2e9,9.4e9						!elastic modulus to 1 m
+pdvar,e_z2,unif,5.2e9,9.4e9						!elastic modulus 	over 1 m
+pdvar,e_puda,unif,2e7,5e8						!elastic modulus 	of soil
+pdvar,podil_koren_1,unif,0.5,0.9				!amount of root volume rootstock
+pdvar,podil_koren_2,unif,0.1,0.7				!amount of root volume 1st layer
+!-----output files	
+pdvar,e_EL1_z10,resp							!strains		
+pdvar,e_EL2_z10,resp						
+!
+pdvar,phi1_zx10,resp							!inclinations	
+pdvar,phi2_zx10,resp			
+!
+pdvar,T10_1_ux,resp							    !displacements	
+pdvar,T10_2_ux,resp
+pdvar,T10_3_ux,resp
+pdvar,T10_4_ux,resp
+pdvar,T10_5_ux,resp
+pdvar,T10_6_ux,resp
+pdvar,T10_7_ux,resp
+pdvar,T10_8_ux,resp							!can be defined to number 33 (maxim displ. markers)
+!------run analysis		
+!
+pdmeth,mcs,dir							    !Monte Carlo simulaton
+pddmcs,400,none,all,,,,123457 				!400 calculations, initial seed of 123457	
+pdexe,strom_1DB_4							!run analysis
+pdsesns,strom_1DB_4,phi1_zx10,both,rank,0.025		!display graph – spearman. coeff, p 2.5%
+/eof									            !finish
+
