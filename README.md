@@ -12,17 +12,17 @@ Work was supported by the Ministry of Education Youth nad Sports in the Czech Re
 creation of segmented tree stem and composite root-plate
 
 ### Input files: 
-**mat_korsys.mac** material properties of root-plate
-**mat_kmen.mac** material properties of stem
-**koef_mat.mac** matrix for reduction of material properties in segments
-**DIC_0.mac** position of markers along the stem
+ <br>**mat_korsys.mac** material properties of root-plate
+ <br>**mat_kmen.mac** material properties of stem
+ <br>**koef_mat.mac** matrix for reduction of material properties in segments
+ <br>**DIC_0.mac** position of markers along the stem
 
-**post_inklino.mac** postprocessing of results - stem base inclination
-**post_extenzo.mac** postprocessing of results - stem strains
-**post_dic.mac** postprocessing of results - displacements
+ <br>**post_inklino.mac** postprocessing of results - stem base inclination
+ <br>**post_extenzo.mac** postprocessing of results - stem strains
+ <br>**post_dic.mac** postprocessing of results - displacements
 
-**resul.mac** write results into tables
+ <br>**resul.mac** write results into tables
 
 # Sensitivity analysis: 
-**strom_pds.mac** run sensitivity analysis by Probabilistic Design System with generation of random input values by Monte Carlo method.
+ <br>**strom_pds.mac** run sensitivity analysis by Probabilistic Design System with generation of random input values by Monte Carlo method.
 
